@@ -1,51 +1,82 @@
+local M = {}
+
 local ts_utils = require "nvim-treesitter.ts_utils"
 
-local containers = {
-  table_constructor = true,
-  arguments = {
-    final_separator = false,
-  },
-  parameters = {
-    final_separator = false,
-    final_end_line = false,
+local make_default_opts = function()
+  return {
+      final_separator = ',',
+      final_end_line = true,
+  }
+end
+
+local make_no_final_sep_opts = function()
+  return {
+      final_separator = false,
+      final_end_line = true,
+  }
+end
+
+local settings = {
+  containers = {
+    lua = {
+      table_constructor = make_default_opts(),
+      arguments = make_no_final_sep_opts(),
+      parameters = make_no_final_sep_opts(),
+    },
+    python = {
+      parameters = make_default_opts(),
+      argument_list = make_default_opts(),
+      list = make_default_opts(),
+      tuple = make_default_opts(),
+    },
   },
 }
 
-local default_opts = {
-    final_separator = ',',
-    final_end_line = true,
-}
-
-local warn = function(msg)
-    msg = vim.fn.escape(msg, '"')
-    vim.cmd(string.format('echohl WarningMsg | echomsg "[trevJ] Warning: %s" | echohl None', msg))
+local warn = function(msg, ...)
+  msg = string.format(msg, ...)
+  msg = vim.fn.escape(msg, '"')
+  vim.cmd(string.format('echohl WarningMsg | echomsg "[trevJ] Warning: %s" | echohl None', msg))
 end
 
-local get_opts = function(node)
-  local opts = containers[node:type()]
-  if type(opts) ~= 'table' then
-    opts = {}
+local set_default_opts = function(filetype, container_type)
+  if settings.containers[filetype] == nil then
+    settings.containers[filetype] = {}
   end
-  for key, _ in pairs(opts) do
-    if default_opts[key] == nil then
-      warn(string.format('unsupported option `%s`', key))
+  if settings.containers[filetype][container_type] == nil then
+    settings.containers[filetype][container_type] = make_default_opts()
+  end
+end
+
+local update_settings = function(opts)
+  local default_opts = make_default_opts()
+  for filetype, containers in pairs(opts) do
+    for container_type, container_opts in pairs(containers) do
+      if type(container_opts) ~= 'table' then
+        container_opts = {}
+      end
+      set_default_opts(filetype, container_type)
+      for key, value in pairs(container_opts) do
+        if default_opts[key] == nil then
+          warn('unsupported option `%s`', key)
+        else
+          settings.containers[filetype][container_type][key] = value
+        end
+      end
     end
   end
-  for key, value in pairs(default_opts) do
-    if opts[key] == nil then
-      opts[key] = value
-    end
-  end
-  return opts
 end
 
-local is_container = function(node)
-  return containers[node:type()] ~= nil
+local get_opts = function(filetype, node)
+  return settings.containers[filetype][node:type()]
 end
 
-local get_container_at_cursor = function()
+local is_container = function(filetype, node)
+  return get_opts(filetype, node) ~= nil
+end
+
+local get_container_at_cursor = function(filetype)
   local node = ts_utils.get_node_at_cursor()
-  while not is_container(node) do
+  while not is_container(filetype, node) do
     node = node:parent()
     if node == nil then
       return
@@ -67,12 +98,20 @@ local lines_end_with = function(lines, char)
   return text:match(char .. '%s*$') ~= nil
 end
 
-local format_at_cursor = function()
-  local node = get_container_at_cursor()
+M.format_at_cursor = function()
+  local filetype = vim.bo.filetype
+  if settings.containers[filetype] == nil then
+    warn('filetype %s if not configured', filetype)
+    return
+  end
+  local node = get_container_at_cursor(filetype)
   if node then
-    local opts = get_opts(node)
+    local opts = get_opts(filetype, node)
     local srow, scol, erow, ecol = node:range()
-    local indent = vim.fn.indent(srow)
+    local indent = vim.fn.indent(srow + 1)
+    print('srow', srow)
+    print('indent', indent)
+    local shiftwidth = vim.fn.shiftwidth()
     local new_lines = {}
     local children = {}
     for child in node:iter_children() do
@@ -86,7 +125,7 @@ local format_at_cursor = function()
         end
       end
       if child:named() then
-        vim.list_extend(new_lines, indent_lines(lines, indent + vim.fn.shiftwidth()))
+        vim.list_extend(new_lines, indent_lines(lines, indent + shiftwidth))
       else
         if opts.final_end_line and i == #children then
           vim.list_extend(new_lines, indent_lines(lines, indent))
@@ -98,17 +137,15 @@ local format_at_cursor = function()
         end
       end
     end
+    P(new_lines)
     vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
   else
     warn('no container at cursor')
   end
 end
 
-format_at_cursor()
+M.setup = function(opts)
+  update_settings(opts)
+end
 
-local test = {foo = {
-  x = 0,
-  y = 1,
-}, bar = true,
-  other = false
-}
+return M
