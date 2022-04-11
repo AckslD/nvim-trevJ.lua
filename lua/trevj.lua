@@ -29,6 +29,12 @@ local settings = {
       list = make_default_opts(),
       tuple = make_default_opts(),
     },
+    rust = {
+      parameters = make_default_opts(),
+      arguments = make_default_opts(),
+      field_declaration_list = make_default_opts(),
+      array_expression = make_default_opts(),
+    },
   },
 }
 
