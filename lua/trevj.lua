@@ -28,6 +28,8 @@ local settings = {
       argument_list = make_default_opts(),
       list = make_default_opts(),
       tuple = make_default_opts(),
+      dictionary = make_default_opts(),
+      set = make_default_opts(),
     },
     rust = {
       parameters = make_default_opts(),
