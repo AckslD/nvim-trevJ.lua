@@ -148,6 +148,7 @@ M.format_at_cursor = function()
 end
 
 M.setup = function(opts)
+  opts = opts or {}
   update_settings(opts)
 end
 
