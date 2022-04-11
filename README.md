@@ -28,7 +28,7 @@ use {
 ```
 
 ## Configuration
-Current default languages only include `lua`, `python` and `rust`. But you can add your own, of even better submit a PR for your favorite language.
+
 When configuring a language you should specify the treesitter node types that contains the child nodes which should be put on separate lines.
 For example for the default configuration for `lua` looks as follows:
 ```lua
@@ -47,6 +47,17 @@ where:
 * `final_separator`: if truthy adds this character after the final child node if not existing.
 * `final_end_line`: if there should be a final line before the and character of the container node.
 For existing languages you can override anything and defaults will be used for anything unspecified.
+
+## Supported Languages
+
+Currently only the following languages are supported by default:
+
+- lua
+- python
+- rust
+- go
+
+You can add your own, of even better submit a PR for your favorite language.
 
 ### Examples
 #### default
