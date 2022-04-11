@@ -18,6 +18,10 @@ end
 
 local settings = {
   containers = {
+    go = {
+      literal_value = make_default_opts(),
+      parameter_list = make_default_opts(),
+    },
     lua = {
       table_constructor = make_default_opts(),
       arguments = make_no_final_sep_opts(),
