@@ -61,7 +61,7 @@ end
 
 local update_settings = function(opts)
   local default_opts = make_default_opts()
-  for filetype, containers in pairs(opts) do
+  for filetype, containers in pairs(opts.containers or {}) do
     for container_type, container_opts in pairs(containers) do
       if type(container_opts) ~= 'table' then
         container_opts = {}
