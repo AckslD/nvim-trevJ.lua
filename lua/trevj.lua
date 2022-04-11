@@ -115,8 +115,6 @@ M.format_at_cursor = function()
     local opts = get_opts(filetype, node)
     local srow, scol, erow, ecol = node:range()
     local indent = vim.fn.indent(srow + 1)
-    print('srow', srow)
-    print('indent', indent)
     local shiftwidth = vim.fn.shiftwidth()
     local new_lines = {}
     local children = {}
@@ -143,7 +141,6 @@ M.format_at_cursor = function()
         end
       end
     end
-    P(new_lines)
     vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
   else
     warn('no container at cursor')
