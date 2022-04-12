@@ -6,6 +6,7 @@ local make_default_opts = function()
   return {
     final_separator = ',',
     final_end_line = true,
+    skip = {},
   }
 end
 
