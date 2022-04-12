@@ -4,15 +4,15 @@ local ts_utils = require "nvim-treesitter.ts_utils"
 
 local make_default_opts = function()
   return {
-      final_separator = ',',
-      final_end_line = true,
+    final_separator = ',',
+    final_end_line = true,
   }
 end
 
 local make_no_final_sep_opts = function()
   return {
-      final_separator = false,
-      final_end_line = true,
+    final_separator = false,
+    final_end_line = true,
   }
 end
 
@@ -21,6 +21,14 @@ local settings = {
     c = {
       argument_list = make_no_final_sep_opts(),
       parameter_list = make_no_final_sep_opts(),
+      field_declaration_list = make_no_final_sep_opts(),
+      initializer_list = make_default_opts(),
+      enumerator_list = make_default_opts(),
+    },
+    cpp = {
+      argument_list = make_no_final_sep_opts(),
+      parameter_list = make_no_final_sep_opts(),
+      field_initializer_list = make_no_final_sep_opts(),
       field_declaration_list = make_no_final_sep_opts(),
       initializer_list = make_default_opts(),
       enumerator_list = make_default_opts(),
