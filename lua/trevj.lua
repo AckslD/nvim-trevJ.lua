@@ -56,6 +56,12 @@ local settings = {
       dictionary = make_default_opts(),
       set = make_default_opts(),
     },
+    ruby = {
+      hash = make_default_opts(),
+      array = make_default_opts(),
+      method_parameters = make_no_final_sep_opts(),
+      argument_list = make_no_final_sep_opts(),
+    },
     rust = {
       parameters = make_default_opts(),
       arguments = make_default_opts(),
