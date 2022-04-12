@@ -4,15 +4,16 @@ local ts_utils = require "nvim-treesitter.ts_utils"
 
 local make_default_opts = function()
   return {
-      final_separator = ',',
-      final_end_line = true,
+    final_separator = ',',
+    final_end_line = true,
+    skip = {},
   }
 end
 
 local make_no_final_sep_opts = function()
   return {
-      final_separator = false,
-      final_end_line = true,
+    final_separator = false,
+    final_end_line = true,
   }
 end
 
