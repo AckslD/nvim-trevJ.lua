@@ -41,6 +41,12 @@ local settings = {
       field_declaration_list = make_default_opts(),
       array_expression = make_default_opts(),
     },
+    c = {
+      parameter_list = make_no_final_sep_opts(),
+      field_declaration_list = make_no_final_sep_opts(),
+      initializer_list = make_default_opts(),
+      enumerator_list = make_default_opts(),
+    }
   },
 }
 
