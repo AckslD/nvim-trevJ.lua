@@ -17,15 +17,21 @@ local make_no_final_sep_opts = function()
   }
 end
 
+local make_c_containers = function()
+  return {
+    argument_list = make_no_final_sep_opts(),
+    parameter_list = make_no_final_sep_opts(),
+    field_initializer_list = make_no_final_sep_opts(),
+    field_declaration_list = make_no_final_sep_opts(),
+    initializer_list = make_default_opts(),
+    enumerator_list = make_default_opts(),
+  }
+end
+
 local settings = {
   containers = {
-    c = {
-      argument_list = make_no_final_sep_opts(),
-      parameter_list = make_no_final_sep_opts(),
-      field_declaration_list = make_no_final_sep_opts(),
-      initializer_list = make_default_opts(),
-      enumerator_list = make_default_opts(),
-    },
+    c = make_c_containers(),
+    cpp = make_c_containers(),
     go = {
       literal_value = make_default_opts(),
       parameter_list = make_default_opts(),
