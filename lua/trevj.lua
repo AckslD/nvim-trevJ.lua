@@ -18,9 +18,23 @@ end
 
 local settings = {
   containers = {
+    c = {
+      argument_list = make_no_final_sep_opts(),
+      parameter_list = make_no_final_sep_opts(),
+      field_declaration_list = make_no_final_sep_opts(),
+      initializer_list = make_default_opts(),
+      enumerator_list = make_default_opts(),
+    },
     go = {
       literal_value = make_default_opts(),
       parameter_list = make_default_opts(),
+    },
+    html = {
+      start_tag = {
+        final_separator = false,
+        final_end_line = true,
+        skip = {tag_name = true},
+      },
     },
     lua = {
       table_constructor = make_default_opts(),
@@ -40,13 +54,6 @@ local settings = {
       arguments = make_default_opts(),
       field_declaration_list = make_default_opts(),
       array_expression = make_default_opts(),
-    },
-    c = {
-      argument_list = make_no_final_sep_opts(),
-      parameter_list = make_no_final_sep_opts(),
-      field_declaration_list = make_no_final_sep_opts(),
-      initializer_list = make_default_opts(),
-      enumerator_list = make_default_opts(),
     },
   },
 }
@@ -141,7 +148,10 @@ M.format_at_cursor = function()
           lines[#lines] = lines[#lines] .. opts.final_separator
         end
       end
-      if child:named() then
+      if opts.skip and opts.skip[child:type()] then
+        new_lines[#new_lines] = new_lines[#new_lines] .. table.remove(lines, 1)
+        vim.list_extend(new_lines, lines)
+      elseif child:named() then
         vim.list_extend(new_lines, indent_lines(lines, indent + shiftwidth))
       else
         if opts.final_end_line and i == #children then

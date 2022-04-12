@@ -46,17 +46,31 @@ require('trevj').setup({
 where:
 * `final_separator`: if truthy adds this character after the final child node if not existing.
 * `final_end_line`: if there should be a final line before the and character of the container node.
+* `skip` (optional): a table where keys correspond to children types to not put on newlines and values are truthy.
+  For example, the default config for `html` is:
+  ```lua
+  html = {
+    start_tag = {
+      final_separator = false,
+      final_end_line = true,
+      skip = {tag_name = true},
+    },
+  }
+  ```
+  in order to not put the `tag_name` on a new line.
+
 For existing languages you can override anything and defaults will be used for anything unspecified.
 
 ## Supported Languages
 
 Currently only the following languages are supported by default:
 
+- c
+- go
+- html
 - lua
 - python
 - rust
-- go
-- c
 
 You can add your own, of even better submit a PR for your favorite language.
 
