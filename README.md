@@ -56,6 +56,7 @@ Currently only the following languages are supported by default:
 - python
 - rust
 - go
+- c
 
 You can add your own, of even better submit a PR for your favorite language.
 
