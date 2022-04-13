@@ -64,9 +64,9 @@ local settings = {
     },
     php = {
       array_creation_expression = make_default_opts(),
-      list_literal = make_default_opts(),
-      formal_parameters = make_default_opts(),
-      arguments = make_default_opts(),
+      list_literal = make_no_final_sep_opts(),
+      formal_parameters = make_no_final_sep_opts(),
+      arguments = make_no_final_sep_opts(),
     },
   },
 }
