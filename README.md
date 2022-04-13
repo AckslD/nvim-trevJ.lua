@@ -63,12 +63,14 @@ For existing languages you can override anything and defaults will be used for a
 
 ## Supported Languages
 
-Currently only the following languages are supported by default:
+Currently the following languages are supported by default:
 
 - c
+- cpp
 - go
 - html
 - lua
+- php
 - python
 - ruby
 - rust
