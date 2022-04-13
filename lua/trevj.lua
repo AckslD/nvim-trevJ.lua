@@ -62,6 +62,12 @@ local settings = {
       field_declaration_list = make_default_opts(),
       array_expression = make_default_opts(),
     },
+    php = {
+      array_creation_expression = make_default_opts(),
+      list_literal = make_default_opts(),
+      formal_parameters = make_default_opts(),
+      arguments = make_default_opts(),
+    },
   },
 }
 
