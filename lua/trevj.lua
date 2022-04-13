@@ -34,6 +34,7 @@ local settings = {
     cpp = make_c_containers(),
     go = {
       literal_value = make_default_opts(),
+      argument_list = make_default_opts(),
       parameter_list = make_default_opts(),
     },
     html = {
