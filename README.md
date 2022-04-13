@@ -70,6 +70,7 @@ Currently only the following languages are supported by default:
 - html
 - lua
 - python
+- ruby
 - rust
 
 You can add your own, of even better submit a PR for your favorite language.
