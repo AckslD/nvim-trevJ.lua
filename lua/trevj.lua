@@ -108,6 +108,14 @@ local settings = {
       field_declaration_list = make_default_opts(),
       array_expression = make_default_opts(),
     },
+    supercollider = {
+      switch = make_default_opts(),
+      case = make_default_opts(),
+      variable_definition_sequence = make_default_opts(),
+      collection = make_default_opts(),
+      parameter_list = make_default_opts(),
+      parameter_call_list = make_default_opts(),
+    },
   }, make_javascript_typescript_containers()),
 }
 
