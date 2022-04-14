@@ -69,11 +69,15 @@ Currently the following languages are supported by default:
 - cpp
 - go
 - html
+- javascript
+- javascriptreact
 - lua
 - php
 - python
 - ruby
 - rust
+- typescript
+- typescriptreact
 
 You can add your own, of even better submit a PR for your favorite language.
 
