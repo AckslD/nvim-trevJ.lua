@@ -1,10 +1,10 @@
 local M = {}
 
-local ts_utils = require "nvim-treesitter.ts_utils"
+local ts_utils = require("nvim-treesitter.ts_utils")
 
 local make_default_opts = function()
   return {
-    final_separator = ',',
+    final_separator = ",",
     final_end_line = true,
     skip = {},
   }
@@ -74,7 +74,7 @@ local settings = {
       start_tag = {
         final_separator = false,
         final_end_line = true,
-        skip = {tag_name = true},
+        skip = { tag_name = true },
       },
     },
     lua = {
@@ -130,13 +130,13 @@ local update_settings = function(opts)
   local default_opts = make_default_opts()
   for filetype, containers in pairs(opts.containers or {}) do
     for container_type, container_opts in pairs(containers) do
-      if type(container_opts) ~= 'table' then
+      if type(container_opts) ~= "table" then
         container_opts = {}
       end
       set_default_opts(filetype, container_type)
       for key, value in pairs(container_opts) do
         if default_opts[key] == nil then
-          warn('unsupported option `%s`', key)
+          warn("unsupported option `%s`", key)
         else
           settings.containers[filetype][container_type][key] = value
         end
@@ -167,20 +167,20 @@ end
 local indent_lines = function(lines, indent)
   local new_lines = {}
   for _, line in ipairs(lines) do
-    table.insert(new_lines, (' '):rep(indent) .. line)
+    table.insert(new_lines, (" "):rep(indent) .. line)
   end
   return new_lines
 end
 
 local lines_end_with = function(lines, char)
   local text = table.concat(lines, [[\n]])
-  return text:match(char .. '%s*$') ~= nil
+  return text:match(char .. "%s*$") ~= nil
 end
 
 M.format_at_cursor = function()
   local filetype = vim.bo.filetype
   if settings.containers[filetype] == nil then
-    warn('filetype %s if not configured', filetype)
+    warn("filetype %s if not configured", filetype)
     return
   end
   local node = get_container_at_cursor(filetype)
@@ -219,7 +219,7 @@ M.format_at_cursor = function()
     end
     vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
   else
-    warn('no container at cursor')
+    warn("no container at cursor")
   end
 end
 
