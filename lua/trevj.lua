@@ -28,8 +28,41 @@ local make_c_containers = function()
   }
 end
 
+local make_javascript_typescript_containers = function()
+  local javascript = {
+    array = make_default_opts(),
+    object = make_default_opts(),
+    arguments = make_default_opts(),
+    namedimports = make_default_opts(),
+    object_pattern = make_default_opts(),
+    formal_parameters = make_default_opts(),
+  }
+
+  local jsx = {
+    jsx_element = make_no_final_sep_opts(),
+    jsx_opening_element = {
+      final_separator = false,
+      final_end_line = true,
+      skip = { identifier = true },
+    },
+  }
+  local typescript_only = {
+    type_parameters = make_default_opts(),
+    type_arguments = make_no_final_sep_opts(),
+  }
+
+  local typescript = vim.tbl_extend("error", javascript, typescript_only)
+
+  return {
+    javascript = javascript,
+    javascriptreact = vim.tbl_extend("error", javascript, jsx),
+    typescript = typescript,
+    typescriptreact = vim.tbl_extend("error", typescript, jsx),
+  }
+end
+
 local settings = {
-  containers = {
+  containers = vim.tbl_extend("error", {
     c = make_c_containers(),
     cpp = make_c_containers(),
     go = {
@@ -75,7 +108,7 @@ local settings = {
       field_declaration_list = make_default_opts(),
       array_expression = make_default_opts(),
     },
-  },
+  }, make_javascript_typescript_containers()),
 }
 
 local warn = function(msg, ...)
