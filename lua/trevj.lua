@@ -1,5 +1,6 @@
 local M = {}
 
+local ts = vim.treesitter.query
 local ts_utils = require("nvim-treesitter.ts_utils")
 
 local make_default_opts = function()
@@ -195,7 +196,7 @@ M.format_at_cursor = function()
       table.insert(children, child)
     end
     for i, child in ipairs(children) do
-      local lines = ts_utils.get_node_text(child)
+      local lines = vim.split(ts.get_node_text(child, 0), "\n")
       if opts.final_separator and i == #children - 1 then
         if not lines_end_with(lines, opts.final_separator) then
           lines[#lines] = lines[#lines] .. opts.final_separator
