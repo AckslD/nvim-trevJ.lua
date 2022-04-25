@@ -76,6 +76,7 @@ Currently the following languages are supported by default:
 - python
 - ruby
 - rust
+- supercollider
 - typescript
 - typescriptreact
 
