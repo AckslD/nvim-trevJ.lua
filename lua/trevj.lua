@@ -97,6 +97,9 @@ local settings = {
       tuple = make_default_opts(),
       dictionary = make_default_opts(),
       set = make_default_opts(),
+      list_comprehension = make_no_final_sep_opts(),
+      generator_expression = make_no_final_sep_opts(),
+      dictionary_comprehension = make_no_final_sep_opts(),
     },
     ruby = {
       hash = make_default_opts(),
