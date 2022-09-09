@@ -51,6 +51,7 @@ local make_javascript_typescript_containers = function()
   local typescript_only = {
     type_parameters = make_default_opts(),
     type_arguments = make_no_final_sep_opts(),
+    object_type = vim.tbl_extend("force", make_default_opts(), { final_separator = ";" }),
   }
 
   local typescript = vim.tbl_extend("error", javascript, typescript_only)
