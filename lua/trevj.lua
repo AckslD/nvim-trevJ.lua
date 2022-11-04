@@ -195,7 +195,7 @@ end
 M.format_at_cursor = function()
   local filetype = vim.bo.filetype
   if settings.containers[filetype] == nil then
-    warn("filetype %s if not configured", filetype)
+    warn("filetype %s is not configured", filetype)
     return
   end
   local node = get_container_at_cursor(filetype)
