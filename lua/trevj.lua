@@ -30,69 +30,6 @@ local make_c_containers = function()
   }
 end
 
-local indent_lines = function(lines, indent)
-  local new_lines = {}
-  for _, line in ipairs(lines) do
-    table.insert(new_lines, (" "):rep(indent) .. line)
-  end
-  return new_lines
-end
-
-local make_ruby_containers = function()
-  local block_handler = function(node, indent, shiftwidth, new_lines)
-    local param_text;
-    local body_text;
-
-    if node:child(1):type() == "block_parameters" then
-      local block_parameters_node = node:child(1)
-      local block_body_node = node:child(2)
-
-      param_text = ts.get_node_text(block_parameters_node, 0)
-      param_text = " " .. param_text
-      body_text = ts.get_node_text(block_body_node, 0)
-    else
-      local block_body_node = node:child(1)
-
-      param_text = ""
-      body_text = ts.get_node_text(block_body_node, 0)
-    end
-
-    local starting_lines = { "do" .. param_text }
-    local middle_lines = indent_lines({ body_text }, indent + shiftwidth)
-    local finishing_lines = indent_lines({ "end" }, indent)
-
-    local body_lines = vim.split(body_text, "\n")
-
-    if #body_lines > 1 then
-      local original_text = ts.get_node_text(node, 0)
-      local original_lines = vim.split(original_text, "\n")
-
-      vim.list_extend(new_lines, original_lines)
-    else
-      vim.list_extend(new_lines, starting_lines)
-      vim.list_extend(new_lines, middle_lines)
-      vim.list_extend(new_lines, finishing_lines)
-    end
-  end
-
-  return {
-    hash = make_default_opts(),
-    array = make_default_opts(),
-    method_parameters = make_default_opts(),
-    argument_list = make_default_opts(),
-    do_block = {
-      final_separator = false,
-      final_end_line = false,
-      custom_handler = block_handler,
-    },
-    block = {
-      final_separator = false,
-      final_end_line = false,
-      custom_handler = block_handler,
-    },
-  }
-end
-
 local make_javascript_typescript_containers = function()
   local javascript = {
     array = make_default_opts(),
@@ -165,12 +102,7 @@ local settings = {
       generator_expression = make_no_final_sep_opts(),
       dictionary_comprehension = make_no_final_sep_opts(),
     },
-    ruby = {
-      hash = make_default_opts(),
-      array = make_default_opts(),
-      method_parameters = make_no_final_sep_opts(),
-      argument_list = make_no_final_sep_opts(),
-    },
+    ruby = require("trevj.containers.ruby").make_containers(),
     rust = {
       parameters = make_default_opts(),
       arguments = make_default_opts(),
@@ -242,6 +174,14 @@ local get_container_at_cursor = function(filetype)
   return node
 end
 
+local indent_lines = function(lines, indent)
+  local new_lines = {}
+  for _, line in ipairs(lines) do
+    table.insert(new_lines, (" "):rep(indent) .. line)
+  end
+  return new_lines
+end
+
 local lines_end_with = function(lines, char)
   local text = table.concat(lines, [[\n]])
   return text:match(char .. "%s*$") ~= nil
@@ -263,7 +203,7 @@ M.format_at_cursor = function()
     local children = {}
 
     if opts.custom_handler then
-      opts.custom_handler(node, indent, shiftwidth, new_lines)
+      opts.custom_handler(node)
     else
       for child in node:iter_children() do
         table.insert(children, child)
@@ -291,8 +231,9 @@ M.format_at_cursor = function()
           end
         end
       end
+
+      vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
     end
-    vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
   else
     warn("no container at cursor")
   end
