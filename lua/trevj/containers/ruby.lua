@@ -146,18 +146,12 @@ local make_ruby_containers = function()
     array = make_default_opts(),
     method_parameters = make_default_opts(),
     argument_list = {
-      final_separator = false,
-      final_end_line = true,
       custom_handler = argument_list_handler,
     },
     do_block = {
-      final_separator = false,
-      final_end_line = false,
       custom_handler = block_handler,
     },
     block = {
-      final_separator = false,
-      final_end_line = false,
       custom_handler = block_handler,
     },
   }
