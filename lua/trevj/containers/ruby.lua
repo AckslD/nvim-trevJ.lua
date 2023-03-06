@@ -24,19 +24,47 @@ local make_ruby_containers = function()
     local shiftwidth = vim.fn.shiftwidth()
     local new_lines = {}
     local identifiers = {}
-    local unsupported_types = {
+    local anonymous_types = {
       ["("] = true,
       [")"] = true,
       [","] = true,
     }
-    local method = ts.get_node_text(node:parent(), 0):match("^%s*([%w_]+)[%(%s]")
+
+    local method = ts.get_node_text(node:prev_sibling(), 0)
+    local candidate_sibling = node
+
+    while candidate_sibling:prev_sibling() do
+      local prev_sibling = candidate_sibling:prev_sibling()
+      local prev_sibling_type = prev_sibling:type()
+
+      if prev_sibling_type == "method_call" then
+        method = ts.get_node_text(prev_sibling, 0)
+        break
+      end
+
+      candidate_sibling = prev_sibling
+    end
 
     for candidate_identifier in node:iter_children() do
       local type = candidate_identifier:type()
 
-      if not unsupported_types[type] then
+      if not anonymous_types[type] then
         table.insert(identifiers, candidate_identifier)
       end
+    end
+
+    local sibling_text;
+
+    if candidate_sibling then
+      local candidate_sibling_text = ts.get_node_text(candidate_sibling, 0)
+
+      if candidate_sibling_text == method then
+        sibling_text = method
+      else
+        sibling_text = candidate_sibling_text .. "." .. method
+      end
+    else
+      sibling_text = method
     end
 
     if node:child(0):type() == "(" then
@@ -44,8 +72,11 @@ local make_ruby_containers = function()
 
       for i, identifier in ipairs(identifiers) do
         if i == 1 then
-          vim.list_extend(new_lines, indent_lines({ method .. "(" }, 0))
+          vim.list_extend(new_lines, indent_lines({ sibling_text .. "(" }, 0))
           vim.list_extend(new_lines, indent_lines({ ts.get_node_text(identifier, 0) .. "," }, additional_indent))
+          if #identifiers == 1 then
+            vim.list_extend(new_lines, indent_lines({ ")" }, scol))
+          end
         elseif i == #identifiers then
           vim.list_extend(new_lines, indent_lines({ ts.get_node_text(identifier, 0) .. "," }, additional_indent))
           vim.list_extend(new_lines, indent_lines({ ")" }, scol))
@@ -58,7 +89,7 @@ local make_ruby_containers = function()
 
       for i, identifier in ipairs(identifiers) do
         if i == 1 then
-          vim.list_extend(new_lines, { method .. " " .. ts.get_node_text(identifier, 0) .. "," })
+          vim.list_extend(new_lines, { sibling_text .. " " .. ts.get_node_text(identifier, 0) .. "," })
         elseif i == #identifiers then
           vim.list_extend(new_lines, indent_lines({ ts.get_node_text(identifier, 0) }, additional_indent))
         else
