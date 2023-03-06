@@ -10,6 +10,14 @@ local make_default_opts = function()
   }
 end
 
+local make_special_array_opts = function()
+  return {
+    final_separator = false,
+    final_end_line = true,
+    skip = {},
+  }
+end
+
 local indent_lines = function(lines, indent)
   local new_lines = {}
   for _, line in ipairs(lines) do
@@ -144,6 +152,8 @@ local make_ruby_containers = function()
   return {
     hash = make_default_opts(),
     array = make_default_opts(),
+    symbol_array = make_special_array_opts(),
+    string_array = make_special_array_opts(),
     method_parameters = make_default_opts(),
     argument_list = {
       custom_handler = argument_list_handler,
@@ -158,4 +168,5 @@ local make_ruby_containers = function()
 end
 
 M.make_containers = make_ruby_containers
+
 return M
