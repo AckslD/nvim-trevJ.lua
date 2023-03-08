@@ -67,6 +67,7 @@ Currently the following languages are supported by default:
 
 - c
 - cpp
+- dart
 - go
 - html
 - javascript

@@ -68,6 +68,11 @@ local settings = {
   containers = vim.tbl_extend("error", {
     c = make_c_containers(),
     cpp = make_c_containers(),
+    dart = {
+      table_constructor = make_default_opts(),
+      arguments = make_no_final_sep_opts(),
+      parameters = make_no_final_sep_opts(),
+    },
     go = {
       literal_value = make_default_opts(),
       argument_list = make_default_opts(),
