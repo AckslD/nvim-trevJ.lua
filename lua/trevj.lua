@@ -216,8 +216,8 @@ M.format_at_cursor = function()
       table.insert(children, child)
     end
     for i, child in ipairs(children) do
-      if opts.final_separator and i == #children - 1 then
       local lines = vim.split(get_node_text(child, 0), "\n")
+      if opts.final_separator and i > 1 and i == #children - 1 then
         if not lines_end_with(lines, opts.final_separator) then
           lines[#lines] = lines[#lines] .. opts.final_separator
         end
