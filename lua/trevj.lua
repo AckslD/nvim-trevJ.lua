@@ -128,6 +128,9 @@ local settings = {
       parameter_list = make_default_opts(),
       parameter_call_list = make_default_opts(),
     },
+    r = {
+      arguments = make_no_final_sep_opts(),
+    },
   }, make_javascript_typescript_containers()),
 }
 
@@ -226,7 +229,13 @@ M.format_at_cursor = function()
         new_lines[#new_lines] = new_lines[#new_lines] .. table.remove(lines, 1)
         vim.list_extend(new_lines, lines)
       elseif child:named() then
+        if #new_lines == 0 then
+          new_lines = { "" }
+        end
         vim.list_extend(new_lines, indent_lines(lines, indent + shiftwidth))
+        if opts.final_end_line and i == #children then
+          vim.list_extend(new_lines, { "" })
+        end
       else
         if opts.final_end_line and i == #children then
           vim.list_extend(new_lines, indent_lines(lines, indent))

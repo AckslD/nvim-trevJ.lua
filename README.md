@@ -1,7 +1,5 @@
 # nvim-trevJ.lua
 
-:warning: *This plugin is in an early stage and docs is a bit sparse. Feel free to try it out though and let me know if you have any problems/suggestions.*
-
 Nvim-plugin for doing the opposite of join-line (J) of arguments, powered by treesitter.
 The intention of the plugin is the same as [`revJ`](https://github.com/AckslD/nvim-revJ.lua).
 However `trevJ` uses treesitter to figure out the formatting and in general does everything much more efficient and better, while not polluting registers, last visual selection etc.
