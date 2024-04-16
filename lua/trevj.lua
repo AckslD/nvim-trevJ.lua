@@ -107,6 +107,27 @@ local settings = {
       list_comprehension = make_no_final_sep_opts(),
       generator_expression = make_no_final_sep_opts(),
       dictionary_comprehension = make_no_final_sep_opts(),
+      import_from_statement = {
+        final_separator = ",",
+        final_end_line = true,
+        skip = function(child)
+          if child.name == "module_name" then
+            return true
+          end
+          local prev_sib = child.node:prev_sibling()
+          if prev_sib and get_node_text(prev_sib, 0) == "import" then
+            return true
+          end
+          return false
+        end,
+        make_seperator = function(child)
+          if get_node_text(child.node, 0) == "," then
+            return ""
+          else
+            return " "
+          end
+        end,
+      },
     },
     ruby = {
       hash = make_default_opts(),
@@ -201,6 +222,30 @@ local lines_end_with = function(lines, char)
   return text:match(char .. "%s*$") ~= nil
 end
 
+local should_skip = function(opts, child)
+  local skip = opts.skip
+  if skip == nil then
+    return false
+  elseif type(skip) == "table" then
+    return skip[child.node:type()]
+  elseif type(skip) == "function" then
+    return skip(child)
+  else
+    warn("unsupported type for skip: `%s`", type(skip))
+  end
+end
+
+local join_without_newline = function(opts, child, new_lines, lines)
+  local sep
+  if opts.make_seperator then
+    sep = opts.make_seperator(child)
+  else
+    sep = ""
+  end
+  new_lines[#new_lines] = new_lines[#new_lines] .. (sep or "") .. table.remove(lines, 1)
+  vim.list_extend(new_lines, lines)
+end
+
 M.format_at_cursor = function()
   local filetype = vim.bo.filetype
   if settings.containers[filetype] == nil then
@@ -215,20 +260,25 @@ M.format_at_cursor = function()
     local shiftwidth = vim.fn.shiftwidth()
     local new_lines = {}
     local children = {}
-    for child in node:iter_children() do
-      table.insert(children, child)
+    for child, name in node:iter_children() do
+      table.insert(children, { node = child, name = name })
     end
     for i, child in ipairs(children) do
-      local lines = vim.split(get_node_text(child, 0), "\n")
-      if opts.final_separator and i > 1 and i == #children - 1 then
+      local lines = vim.split(get_node_text(child.node, 0), "\n")
+      if
+        opts.final_separator
+        and i > 1
+        and i == #children - 1
+        and child.node:named()
+        and not should_skip(opts, child)
+      then
         if not lines_end_with(lines, opts.final_separator) then
           lines[#lines] = lines[#lines] .. opts.final_separator
         end
       end
-      if opts.skip and opts.skip[child:type()] then
-        new_lines[#new_lines] = new_lines[#new_lines] .. table.remove(lines, 1)
-        vim.list_extend(new_lines, lines)
-      elseif child:named() then
+      if should_skip(opts, child) then
+        join_without_newline(opts, child, new_lines, lines)
+      elseif child.node:named() then
         if #new_lines == 0 then
           new_lines = { "" }
         end
@@ -242,8 +292,7 @@ M.format_at_cursor = function()
         elseif #new_lines == 0 then
           vim.list_extend(new_lines, lines)
         else
-          -- TODO assert single?
-          new_lines[#new_lines] = new_lines[#new_lines] .. lines[1]
+          join_without_newline(opts, child, new_lines, lines)
         end
       end
     end

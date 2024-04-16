@@ -56,6 +56,8 @@ where:
   }
   ```
   in order to not put the `tag_name` on a new line.
+  This can also be a callable which takes a table of with the fields `node` and `name` and should return `bool`. See example for usage for `import_from_statement` in `python`.
+* `make_seperator` (optional): a callable taking a table of with the fields `node` and `name` and should return a `string` to be used as a separator before the node (defaults to `''`). Note this is only used when a newline is not used (for example if the node is skipped or not named). See example for usage for `import_from_statement` in `python`.
 
 For existing languages you can override anything and defaults will be used for anything unspecified.
 
