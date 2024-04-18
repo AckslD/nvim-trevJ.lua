@@ -107,27 +107,7 @@ local settings = {
       list_comprehension = make_no_final_sep_opts(),
       generator_expression = make_no_final_sep_opts(),
       dictionary_comprehension = make_no_final_sep_opts(),
-      import_from_statement = {
-        final_separator = ",",
-        final_end_line = true,
-        skip = function(child)
-          if child.name == "module_name" then
-            return true
-          end
-          local prev_sib = child.node:prev_sibling()
-          if prev_sib and get_node_text(prev_sib, 0) == "import" then
-            return true
-          end
-          return false
-        end,
-        make_seperator = function(child)
-          if get_node_text(child.node, 0) == "," then
-            return ""
-          else
-            return " "
-          end
-        end,
-      },
+      import_from_statement = require("trevj.python").import_from_statement,
     },
     ruby = {
       hash = make_default_opts(),
@@ -236,6 +216,10 @@ local should_skip = function(opts, child)
 end
 
 local join_without_newline = function(opts, child, new_lines, lines)
+  if #new_lines == 0 then
+    vim.list_extend(new_lines, lines)
+    return
+  end
   local sep
   if opts.make_seperator then
     sep = opts.make_seperator(child)
@@ -260,6 +244,7 @@ M.format_at_cursor = function()
     local shiftwidth = vim.fn.shiftwidth()
     local new_lines = {}
     local children = {}
+    local added_newlines = false
     for child, name in node:iter_children() do
       table.insert(children, { node = child, name = name })
     end
@@ -279,6 +264,7 @@ M.format_at_cursor = function()
       if should_skip(opts, child) then
         join_without_newline(opts, child, new_lines, lines)
       elseif child.node:named() then
+        added_newlines = true
         if #new_lines == 0 then
           new_lines = { "" }
         end
@@ -289,14 +275,15 @@ M.format_at_cursor = function()
       else
         if opts.final_end_line and i == #children then
           vim.list_extend(new_lines, indent_lines(lines, indent))
-        elseif #new_lines == 0 then
-          vim.list_extend(new_lines, lines)
         else
           join_without_newline(opts, child, new_lines, lines)
         end
       end
     end
     vim.api.nvim_buf_set_text(0, srow, scol, erow, ecol, new_lines)
+    if not added_newlines then
+      warn("nothing to format at cursor")
+    end
   else
     warn("no container at cursor")
   end
