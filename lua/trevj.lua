@@ -130,7 +130,11 @@ local settings = {
       parameter_call_list = make_default_opts(),
     },
     r = {
-      arguments = make_no_final_sep_opts(),
+      arguments = {
+        final_separator = false,
+        final_end_line = true,
+        skip = { comma = true },
+      },
     },
   }, make_javascript_typescript_containers()),
 }
@@ -226,7 +230,7 @@ local join_without_newline = function(opts, child, new_lines, lines)
   else
     sep = ""
   end
-  new_lines[#new_lines] = new_lines[#new_lines] .. (sep or "") .. table.remove(lines, 1)
+  new_lines[#new_lines] = new_lines[#new_lines] .. sep .. table.remove(lines, 1)
   vim.list_extend(new_lines, lines)
 end
 
