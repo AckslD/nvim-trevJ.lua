@@ -1,9 +1,6 @@
 local M = {}
 
 local ts = vim.treesitter
-local get_node_text = vim.treesitter.get_node_text or vim.treesitter.query.get_node_text
-local ts_utils = require("nvim-treesitter.ts_utils")
-local parsers = require("nvim-treesitter.parsers")
 
 local make_default_opts = function()
   return {
@@ -182,8 +179,11 @@ local is_container = function(filetype, node)
 end
 
 local get_container_at_cursor = function(filetype)
-  parsers.get_parser(0):parse()
-  local node = ts_utils.get_node_at_cursor()
+  ts.get_parser():parse()
+  local node = ts.get_node()
+  if node == nil then
+    return
+  end
   while not is_container(filetype, node) do
     node = node:parent()
     if node == nil then
@@ -253,7 +253,7 @@ M.format_at_cursor = function()
       table.insert(children, { node = child, name = name })
     end
     for i, child in ipairs(children) do
-      local lines = vim.split(get_node_text(child.node, 0), "\n")
+      local lines = vim.split(ts.get_node_text(child.node, 0), "\n")
       if
         opts.final_separator
         and i > 1
